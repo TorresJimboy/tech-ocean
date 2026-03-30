@@ -8,11 +8,11 @@ const ThemeContext = createContext({
 export function ThemeProvider({ children }) {
   const [theme, setTheme] = useState('light');
 
+  // Load saved theme or system preference
   useEffect(() => {
-    // Check localStorage and system preference
     const stored = localStorage.getItem('techocean_theme');
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
+
     if (stored) {
       setTheme(stored);
     } else if (prefersDark) {
@@ -20,16 +20,21 @@ export function ThemeProvider({ children }) {
     }
   }, []);
 
+  // Apply theme to <html>
   useEffect(() => {
-    // Update document class and localStorage
     const root = document.documentElement;
-    root.classList.remove('light', 'dark');
-    root.classList.add(theme);
+
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+
     localStorage.setItem('techocean_theme', theme);
   }, [theme]);
 
   const toggleTheme = () => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+    setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
   };
 
   return (
@@ -41,8 +46,10 @@ export function ThemeProvider({ children }) {
 
 export function useTheme() {
   const context = useContext(ThemeContext);
+
   if (!context) {
     throw new Error('useTheme must be used within ThemeProvider');
   }
+
   return context;
 }
