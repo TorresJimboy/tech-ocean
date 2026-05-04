@@ -6,7 +6,6 @@ export function CartProvider({ children }) {
   const [cart, setCart] = useState([]);
 
   useEffect(() => {
-    // Load cart from localStorage on mount
     const storedCart = localStorage.getItem('techocean_cart');
     if (storedCart) {
       setCart(JSON.parse(storedCart));
@@ -14,8 +13,6 @@ export function CartProvider({ children }) {
   }, []);
 
   useEffect(() => {
-    // Save cart to localStorage whenever it changes
-    // In production, this will sync with Supabase
     localStorage.setItem('techocean_cart', JSON.stringify(cart));
   }, [cart]);
 

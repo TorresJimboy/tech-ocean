@@ -1,16 +1,15 @@
 import { Link } from 'react-router';
 import { ArrowRight, Truck, Shield, Headphones } from 'lucide-react';
-import { products } from '../data/products';
+import { useProducts } from '../hooks/useProducts';
 import { ProductCard } from '../components/ProductCard';
 
 export function Home() {
+  const { products, loading, error } = useProducts();
   const featuredProducts = products.filter(p => p.featured);
 
   return (
     <div className="flex flex-col">
-      {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-[#0f1729] via-[#1e2a44] to-[#0f1729] dark:from-[#0a0e1a] dark:via-[#12182b] dark:to-[#0a0e1a] text-white">
-        {/* Decorative Elements */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-10 left-10 w-72 h-72 bg-[#d4af37] rounded-full blur-[100px]"></div>
           <div className="absolute bottom-10 right-10 w-96 h-96 bg-[#d4af37] rounded-full blur-[120px]"></div>
@@ -50,7 +49,6 @@ export function Home() {
         <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background to-transparent"></div>
       </section>
 
-      {/* Features */}
       <section className="border-b border-[var(--border)] bg-card">
         <div className="container mx-auto px-4 py-16">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -85,7 +83,6 @@ export function Home() {
         </div>
       </section>
 
-      {/* Featured Products */}
       <section className="py-20 bg-background">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-12">
@@ -103,11 +100,24 @@ export function Home() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {featuredProducts.map(product => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {Array.from({ length: 4 }).map((_, index) => (
+                <div key={index} className="h-[420px] rounded-2xl border border-[var(--border)] bg-card animate-pulse" />
+              ))}
+            </div>
+          ) : error ? (
+            <div className="rounded-2xl border border-[var(--border)] bg-card p-8 text-center">
+              <p className="font-semibold mb-2">Featured products are unavailable</p>
+              <p className="text-sm text-muted-foreground">{error}</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {featuredProducts.map(product => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          )}
 
           <div className="mt-12 text-center md:hidden">
             <Link
@@ -121,7 +131,6 @@ export function Home() {
         </div>
       </section>
 
-      {/* Categories */}
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
@@ -183,11 +192,9 @@ export function Home() {
         </div>
       </section>
 
-      {/* CTA Section */}
       <section className="py-20 bg-background">
         <div className="container mx-auto px-4">
           <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0f1729] via-[#1e2a44] to-[#0f1729] dark:from-[#12182b] dark:via-[#1e2a44] dark:to-[#12182b] px-8 py-20 md:px-16 text-white text-center shadow-[var(--shadow-luxury-hover)]">
-            {/* Decorative Elements */}
             <div className="absolute inset-0 opacity-10">
               <div className="absolute top-0 right-0 w-96 h-96 bg-[#d4af37] rounded-full blur-[120px]"></div>
             </div>

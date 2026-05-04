@@ -1,7 +1,8 @@
 import { useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router';
 import { Filter, X } from 'lucide-react';
-import { products, categories } from '../data/products';
+import { useProducts } from '../hooks/useProducts';
+import { categories } from '../services/products';
 import { ProductCard } from '../components/ProductCard';
 
 export function Products() {
@@ -9,23 +10,21 @@ export function Products() {
   const [showFilters, setShowFilters] = useState(false);
   const [priceRange, setPriceRange] = useState([0, 5000]);
   const [sortBy, setSortBy] = useState('featured');
+  const { products, loading, error } = useProducts();
 
   const categoryFilter = searchParams.get('category') || 'all';
 
   const filteredProducts = useMemo(() => {
-    let filtered = products;
+    let filtered = [...products];
 
-    // Category filter
     if (categoryFilter !== 'all') {
       filtered = filtered.filter(p => p.category === categoryFilter);
     }
 
-    // Price filter
     filtered = filtered.filter(
       p => p.price >= priceRange[0] && p.price <= priceRange[1]
     );
 
-    // Sorting
     switch (sortBy) {
       case 'price-low':
         filtered.sort((a, b) => a.price - b.price);
@@ -40,7 +39,6 @@ export function Products() {
         filtered.sort((a, b) => b.rating - a.rating);
         break;
       default:
-        // Featured: featured items first, then by rating
         filtered.sort((a, b) => {
           if (a.featured && !b.featured) return -1;
           if (!a.featured && b.featured) return 1;
@@ -147,9 +145,7 @@ export function Products() {
           </div>
         </aside>
 
-        {/* Products Grid */}
         <div className="flex-1">
-          {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <div>
               <h1 className="text-3xl font-bold mb-2">Products</h1>
@@ -166,8 +162,18 @@ export function Products() {
             </button>
           </div>
 
-          {/* Products */}
-          {filteredProducts.length > 0 ? (
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {Array.from({ length: 6 }).map((_, index) => (
+                <div key={index} className="h-[420px] rounded-2xl border border-[var(--border)] bg-card animate-pulse" />
+              ))}
+            </div>
+          ) : error ? (
+            <div className="rounded-2xl border border-[var(--border)] bg-card p-8 text-center">
+              <p className="font-semibold mb-2">Products are unavailable</p>
+              <p className="text-sm text-muted-foreground">{error}</p>
+            </div>
+          ) : filteredProducts.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredProducts.map(product => (
                 <ProductCard key={product.id} product={product} />

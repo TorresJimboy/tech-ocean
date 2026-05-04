@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router';
 import { Star, ShoppingCart, Minus, Plus, Check } from 'lucide-react';
-import { products } from '../data/products';
+import { useProduct, useProducts } from '../hooks/useProducts';
 import { useCart } from '../contexts/CartContext';
 import { toast } from 'sonner';
 
@@ -10,13 +10,29 @@ export function ProductDetail() {
   const navigate = useNavigate();
   const { addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
+  const { product, loading, error } = useProduct(id);
+  const { products } = useProducts();
 
-  const product = products.find(p => p.id === parseInt(id));
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          <div className="aspect-square rounded-lg bg-muted animate-pulse" />
+          <div className="space-y-5">
+            <div className="h-8 w-2/3 rounded bg-muted animate-pulse" />
+            <div className="h-6 w-1/3 rounded bg-muted animate-pulse" />
+            <div className="h-28 rounded bg-muted animate-pulse" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-  if (!product) {
+  if (error || !product) {
     return (
       <div className="container mx-auto px-4 py-16 text-center">
-        <h1 className="text-2xl font-bold mb-4">Product Not Found</h1>
+        <h1 className="text-2xl font-bold mb-4">{error ? 'Products are unavailable' : 'Product Not Found'}</h1>
+        {error && <p className="text-sm text-muted-foreground mb-6">{error}</p>}
         <Link to="/products" className="text-blue-600 hover:text-blue-700">
           Back to Products
         </Link>
@@ -40,7 +56,6 @@ export function ProductDetail() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      {/* Breadcrumb */}
       <nav className="text-sm mb-8">
         <Link to="/" className="text-gray-500 hover:text-gray-700">Home</Link>
         <span className="mx-2 text-gray-400">/</span>
@@ -49,9 +64,7 @@ export function ProductDetail() {
         <span>{product.name}</span>
       </nav>
 
-      {/* Product Detail */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
-        {/* Image */}
         <div className="aspect-square overflow-hidden rounded-lg bg-gray-100">
           <img
             src={product.image}
@@ -60,7 +73,6 @@ export function ProductDetail() {
           />
         </div>
 
-        {/* Info */}
         <div className="space-y-6">
           <div>
             <div className="text-sm text-gray-500 uppercase tracking-wide mb-2">
@@ -68,7 +80,6 @@ export function ProductDetail() {
             </div>
             <h1 className="text-3xl font-bold mb-4">{product.name}</h1>
             
-            {/* Rating */}
             <div className="flex items-center space-x-2 mb-4">
               <div className="flex items-center space-x-1">
                 {[...Array(5)].map((_, i) => (
@@ -85,19 +96,16 @@ export function ProductDetail() {
               <span className="text-sm">({product.rating})</span>
             </div>
 
-            {/* Price */}
             <div className="text-4xl font-bold mb-6">
               ${product.price.toFixed(2)}
             </div>
           </div>
 
-          {/* Description */}
           <div>
             <h2 className="font-semibold mb-2">Description</h2>
             <p className="text-gray-600">{product.description}</p>
           </div>
 
-          {/* Features */}
           <div>
             <h2 className="font-semibold mb-3">Key Features</h2>
             <ul className="space-y-2">
@@ -110,7 +118,6 @@ export function ProductDetail() {
             </ul>
           </div>
 
-          {/* Stock */}
           <div>
             {product.stock > 0 ? (
               <div className="flex items-center space-x-2 text-green-600">
@@ -122,7 +129,6 @@ export function ProductDetail() {
             )}
           </div>
 
-          {/* Quantity Selector */}
           <div>
             <h2 className="font-semibold mb-3">Quantity</h2>
             <div className="flex items-center space-x-3">
@@ -144,7 +150,6 @@ export function ProductDetail() {
             </div>
           </div>
 
-          {/* Actions */}
           <div className="flex flex-col sm:flex-row gap-4">
             <button
               onClick={handleAddToCart}
@@ -165,7 +170,6 @@ export function ProductDetail() {
         </div>
       </div>
 
-      {/* Related Products */}
       {relatedProducts.length > 0 && (
         <div>
           <h2 className="text-2xl font-bold mb-6">Related Products</h2>

@@ -7,7 +7,6 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check for existing session on mount
     const storedUser = localStorage.getItem('techocean_user');
     if (storedUser) {
       setUser(JSON.parse(storedUser));
@@ -16,7 +15,6 @@ export function AuthProvider({ children }) {
   }, []);
 
   const signup = (email, password, name) => {
-    // Mock signup - in production, this will use Supabase
     const newUser = {
       id: Date.now().toString(),
       email,
@@ -24,7 +22,6 @@ export function AuthProvider({ children }) {
       createdAt: new Date().toISOString()
     };
     
-    // Store user data (in production, this will be in Supabase)
     localStorage.setItem('techocean_user', JSON.stringify(newUser));
     localStorage.setItem(`user_${email}`, JSON.stringify({ email, password, ...newUser }));
     
@@ -33,7 +30,6 @@ export function AuthProvider({ children }) {
   };
 
   const login = (email, password) => {
-    // Mock login - in production, this will use Supabase Auth
     const storedUserData = localStorage.getItem(`user_${email}`);
     
     if (!storedUserData) {
